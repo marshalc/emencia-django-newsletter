@@ -49,6 +49,7 @@ class ExcelResponse(HttpResponse):
             for rowx, row in enumerate(data):
                 for colx, value in enumerate(row):
                     if isinstance(value, datetime.datetime):
+                        value = value.replace(tzinfo=None)  # dates must be offset naive
                         cell_style = styles['datetime']
                     elif isinstance(value, datetime.date):
                         cell_style = styles['date']
