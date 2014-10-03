@@ -13,7 +13,7 @@ def vcard_contact_export(contact):
 
     vcard = vobject.vCard()
     vcard.add('n')
-    vcard.n.value = vobject.vcard.Name(name=contact.full_name)
+    vcard.n.value = vobject.vcard.Name(family=contact.full_name)
     vcard.add('fn')
     vcard.fn.value = contact.full_name
     vcard.add('email')
