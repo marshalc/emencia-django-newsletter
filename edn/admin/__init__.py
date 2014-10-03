@@ -7,12 +7,12 @@ from django.conf import settings
 from edn.models import Contact, Newsletter, MailingList, SubscriberVerification
 
 from edn.admin.contact import ContactAdmin
-from edn.admin.newsletter import BaseNewsletterAdmin
+from edn.admin.newsletter import NewsletterAdmin
 from edn.admin.mailinglist import MailingListAdmin
 from edn.admin.mailinglist import SubscriberVerificationAdmin
 
 admin.site.register(Contact, ContactAdmin)
-admin.site.register(Newsletter, BaseNewsletterAdmin)
+admin.site.register(Newsletter, NewsletterAdmin)
 admin.site.register(MailingList, MailingListAdmin)
 admin.site.register(SubscriberVerification, SubscriberVerificationAdmin)
 

@@ -12,8 +12,6 @@ from django.contrib.admin.views.main import ChangeList
 from django.db import DatabaseError
 from django.dispatch import Signal
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
 from edn.models import MailingList
@@ -40,7 +38,7 @@ class ContactAdmin(admin.ModelAdmin):
     actions_on_top = False
     actions_on_bottom = True
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         queryset = super(ContactAdmin, self).queryset(request)
         # if not request.user.is_superuser and USE_WORKGROUPS:
         #     contacts_pk = request_workgroups_contacts_pk(request)
@@ -124,7 +122,7 @@ class ContactAdmin(admin.ModelAdmin):
     #
     #     context = {'title': _('Contact importation'),
     #                'opts': opts,
-    #                #~ 'root_path': self.admin_site.root_path,  TODO: Investigate this further
+    #                #~ 'root_path': self.admin_site.root_path,
     #                'root_path': reverse('admin:index'),
     #                'app_label': opts.app_label}
     #

@@ -2,20 +2,10 @@
 import string
 from django.conf import settings
 
-UNIQUE_KEY_LENGTH = getattr(settings, 'NEWSLETTER_UNIQUE_KEY_LENGTH', 8)
-UNIQUE_KEY_CHAR_SET = getattr(settings, 'NEWSLETTER_UNIQUE_KEY_CHAR_SET', string.ascii_uppercase + string.digits)
 
-# Email header defaults
-DEFAULT_HEADER_SENDER = getattr(settings, 'NEWSLETTER_DEFAULT_HEADER_SENDER', 'edn Newsletter<noreply@example.com>')
-DEFAULT_HEADER_REPLY = getattr(settings, 'NEWSLETTER_DEFAULT_HEADER_REPLY', DEFAULT_HEADER_SENDER)
 
 # Allow the unsubscribe form to unsubscribe from all newsletters
 UNSUBSCRIBE_ALL = getattr(settings, 'NEWSLETTER_UNSUBSCRIBE_ALL', False)
-
-# Settings related to optional WYSIWYG components
-USE_CKEDITOR = getattr(settings, 'NEWSLETTER_USE_CKEDITOR', 'ckeditor' in settings.INSTALLED_APPS)
-USE_TINYMCE = getattr(settings, 'NEWSLETTER_USE_TINYMCE', 'tinymce' in settings.INSTALLED_APPS)
-TINYMCE_WIDGET_ATTRS = getattr(settings, 'TINYMCE_WIDGET_ATTRS', {'cols': 150, 'rows': 80})
 
 
 # See cleanEDN/edn/views/tinymce_utils.py
@@ -38,3 +28,14 @@ TRACKING_LINKS = getattr(settings, 'NEWSLETTER_TRACKING_LINKS', True)
 
 # cleanEDN/edn/views/tracking.py
 USE_UTM_TAGS = getattr(settings, 'NEWSLETTER_USE_UTM_TAGS', True)
+
+# TinyMCE is not optional
+TINYMCE_WIDGET_ATTRS = getattr(settings, 'TINYMCE_WIDGET_ATTRS', {'cols': 150, 'rows': 80})
+
+
+UNIQUE_KEY_LENGTH = getattr(settings, 'NEWSLETTER_UNIQUE_KEY_LENGTH', 8)
+UNIQUE_KEY_CHAR_SET = getattr(settings, 'NEWSLETTER_UNIQUE_KEY_CHAR_SET', string.ascii_uppercase + string.digits)
+
+# Email header defaults
+DEFAULT_HEADER_SENDER = getattr(settings, 'NEWSLETTER_DEFAULT_HEADER_SENDER', 'edn Newsletter<noreply@example.com>')
+DEFAULT_HEADER_REPLY = getattr(settings, 'NEWSLETTER_DEFAULT_HEADER_REPLY', DEFAULT_HEADER_SENDER)

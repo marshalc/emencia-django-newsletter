@@ -39,7 +39,7 @@ class BaseNewsletterAdmin(admin.ModelAdmin):
             del actions['make_cancel_sending']
         return actions
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         queryset = super(BaseNewsletterAdmin, self).queryset(request)
         return queryset
 
@@ -143,10 +143,10 @@ class BaseNewsletterAdmin(admin.ModelAdmin):
 
 class NewsletterTinyMCEForm(forms.ModelForm):
     content = forms.CharField(label=_('content'),
-        widget=TinyMCE(attrs=TINYMCE_WIDGET_ATTRS))
+                              widget=TinyMCE(attrs=TINYMCE_WIDGET_ATTRS))
 
     class Meta:
         model = Newsletter
 
-    class NewsletterAdmin(BaseNewsletterAdmin):
-        form = NewsletterTinyMCEForm
+class NewsletterAdmin(BaseNewsletterAdmin):
+    form = NewsletterTinyMCEForm

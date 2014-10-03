@@ -1,28 +1,19 @@
-# Create your models here.
 """
 Models for edn
 """
 import logging
-import mimetypes
 from datetime import datetime
-from email import message_from_file
-from email.encoders import encode_base64
-from email.mime.audio import MIMEAudio
-from email.mime.base import MIMEBase
-from email.mime.image import MIMEImage
-from email.mime.text import MIMEText
 from random import sample
 from smtplib import SMTPRecipientsRefused
 from urllib2 import urlopen
 
 from autoslug import AutoSlugField
 from django.conf import settings
-from django.contrib.auth.models import Group
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
 from django.template import Context, Template
-from django.utils.encoding import force_unicode, smart_str, smart_unicode
+from django.utils.encoding import smart_str, smart_unicode
 from django.utils.translation import ugettext_lazy as _
 from premailer import Premailer, transform
 from uuidfield import UUIDField
@@ -32,7 +23,7 @@ from django.template.loader import get_template
 
 
 from edn.managers import ContactManager
-from edn.settings import BASE_PATH, INCLUDE_UNSUBSCRIPTION, TRACKING_LINKS, TRACKING_IMAGE, TRACKING_IMAGE_FORMAT, UNIQUE_KEY_LENGTH, UNIQUE_KEY_CHAR_SET
+from edn.settings import TRACKING_LINKS, TRACKING_IMAGE_FORMAT, UNIQUE_KEY_LENGTH, UNIQUE_KEY_CHAR_SET
 from edn.utils import html2text
 from edn.utils.template import get_templates
 
@@ -208,7 +199,8 @@ class Newsletter(models.Model):
     status = models.IntegerField(_('status'), choices=STATUS_CHOICES, default=DRAFT)
     sending_date = models.DateTimeField(_('sending date'), default=datetime.now)
 
-    slug = AutoSlugField(help_text=_('Used for displaying the newsletter on the site.'), populate_from="title", unique=True)
+    slug = AutoSlugField(help_text=_('Used for displaying the newsletter on the site.'),
+                         populate_from="title", unique=True)
     creation_date = models.DateTimeField(_('creation date'), auto_now_add=True)
     modification_date = models.DateTimeField(_('modification date'), auto_now=True)
 
@@ -222,15 +214,15 @@ class Newsletter(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('newsletter_newsletter_public', (self.slug,))
+        return 'newsletter_newsletter_public', (self.slug,)
 
     @models.permalink
     def get_historic_url(self):
-        return ('newsletter_newsletter_historic', (self.slug,))
+        return 'newsletter_newsletter_historic', (self.slug,)
 
     @models.permalink
     def get_statistics_url(self):
-        return ('newsletter_newsletter_statistics', (self.slug,))
+        return 'newsletter_newsletter_statistics', (self.slug,)
 
     def __unicode__(self):
         return self.title
@@ -258,9 +250,7 @@ class Newsletter(models.Model):
         except:
             now = datetime.now()
 
-        if self.sending_date <= now and \
-               (self.status == Newsletter.WAITING or \
-                self.status == Newsletter.SENDING):
+        if self.sending_date <= now and (self.status == Newsletter.WAITING or self.status == Newsletter.SENDING):
             return True
 
         return False
@@ -300,8 +290,7 @@ class Newsletter(models.Model):
     def update_newsletter_status(self):
         if self.status == Newsletter.WAITING:
             self.status = Newsletter.SENDING
-        if self.status == Newsletter.SENDING and self.mails_sent() >= \
-               self.mailing_list.expedition_set().count():
+        if self.status == Newsletter.SENDING and self.mails_sent() >= self.mailing_list.expedition_set().count():
             self.status = Newsletter.SENT
         self.save()
 
@@ -336,13 +325,13 @@ class Newsletter(models.Model):
         context.update({'message': message_content})
 
         # link_site_exist = False
-        link_site = render_to_string('newsletter/newsletter_link_site.html', context)
+        link_site = render_to_string('views/newsletter_link_site.html', context)
         context.update({'link_site': link_site})
 
-        unsubscription = render_to_string('newsletter/newsletter_link_unsubscribe.html', context)
+        unsubscription = render_to_string('views/newsletter_link_unsubscribe.html', context)
         context.update({'unsubscription': unsubscription})
 
-        image_tracking = render_to_string('newsletter/newsletter_image_tracking.html', context)
+        image_tracking = render_to_string('views/newsletter_image_tracking.html', context)
         context.update({'image_tracking': image_tracking})
 
         content_template = get_template('mailtemplates/{0}/{1}'.format(self.template, 'index.html'))

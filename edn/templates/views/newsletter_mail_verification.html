@@ -1,0 +1,8 @@
+{% load url from future %}
+{% load i18n %}
+
+<body>
+  <p>{% trans "Thanks for subscription, please click the following link to verify your email address." %}</p>
+  <p><a href="{{ base_url }}{% url 'newsletter_subscriber_verification' link_id %}">{% trans "Verify link" %}</a>
+</p>
+</body>
