@@ -1,0 +1,6 @@
+# Required includes
+Django >= 1.7
+
+
+# Optional includes?
+ipython >= 0.13

@@ -1,8 +1,0 @@
-[main]
-host = http://www.transifex.com
-
-[emencia-django-newsletter-ng.djangopo]
-file_filter = emencia/locale/<lang>/LC_MESSAGES/django.po
-source_file = emencia/locale/django.pot
-source_lang = en
-type = PO
