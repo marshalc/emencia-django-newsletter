@@ -22,7 +22,7 @@ class BaseNewsletterAdmin(admin.ModelAdmin):
     search_fields = ('title', 'content', 'header_sender', 'header_reply')
     filter_horizontal = ['test_contacts']
     fieldsets = (
-        (None, {'fields': ('title', 'template', 'content', 'public',)}),
+        (None, {'fields': ('title', 'template', 'content',)}),
         (_('Receivers'), {'fields': ('mailing_list', 'test_contacts',)}),
         (_('Sending'), {'fields': ('sending_date', 'status',)}),
         (_('Miscellaneous'), {'fields': ('header_sender', 'header_reply', 'base_url'), 'classes': ('collapse',)}),
