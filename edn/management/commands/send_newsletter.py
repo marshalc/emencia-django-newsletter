@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils.translation import activate
 from django.core.management.base import NoArgsCommand
 
-from emencia.models import Newsletter
+from edn.models import Newsletter
 
 import logging
 

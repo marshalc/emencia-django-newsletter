@@ -1,5 +1,6 @@
+# Create your models here.
 """
-Models for emencia
+Models for edn
 """
 import logging
 import mimetypes
@@ -17,8 +18,8 @@ from urllib2 import urlopen
 from autoslug import AutoSlugField
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
+from django.core.mail import EmailMultiAlternatives
 from django.db import models
 from django.template import Context, Template
 from django.utils.encoding import force_unicode, smart_str, smart_unicode
@@ -30,24 +31,27 @@ from django.template.loader import render_to_string
 from django.template.loader import get_template
 
 
-from emencia.managers import ContactManager
-from emencia.settings import BASE_PATH, INCLUDE_UNSUBSCRIPTION, TRACKING_LINKS, TRACKING_IMAGE, TRACKING_IMAGE_FORMAT, UNIQUE_KEY_LENGTH, UNIQUE_KEY_CHAR_SET
-from emencia.utils import html2text
-from emencia.utils.template import get_templates
-from emencia.utils.vcard import vcard_contact_export
+from edn.managers import ContactManager
+from edn.settings import BASE_PATH, INCLUDE_UNSUBSCRIPTION, TRACKING_LINKS, TRACKING_IMAGE, TRACKING_IMAGE_FORMAT, UNIQUE_KEY_LENGTH, UNIQUE_KEY_CHAR_SET
+from edn.utils import html2text
+from edn.utils.template import get_templates
 
 
 logger = logging.getLogger(__name__)
 
+
 class Contact(models.Model):
     """Contact for emailing"""
 
+    # Contact's email address and name
     email = models.EmailField(_('email'), unique=True)
-    verified = models.BooleanField('verified', default=False)
     full_name = models.CharField(_('full name'), max_length=255, null=True, blank=True)
 
-    subscriber = models.BooleanField(_('subscriber'), default=True)
-    valid = models.BooleanField(_('valid email'), default=True)
+    # Has contact validated their email via
+    verified = models.BooleanField('verified', default=False)
+    verified_on = models.DateTimeField('verified on', blank=True, null=True)
+
+    # Use this contact for a test mail out
     tester = models.BooleanField(_('contact tester'), default=False)
 
     creation_date = models.DateTimeField(_('creation date'), auto_now_add=True)
@@ -63,15 +67,15 @@ class Contact(models.Model):
         """Return the user unsubscriptions"""
         return MailingList.objects.filter(unsubscribers=self)
 
-    def vcard_format(self):
-        return vcard_contact_export(self)
+    # def vcard_format(self):
+    #     return vcard_contact_export(self)
 
     def mail_format(self):
         if self.full_name:
-            return '"%s" <%s>' % (
-                unicode(self.full_name).encode('utf-8'),
-                unicode(self.email).encode('utf-8')
-            )
+            return smart_unicode('"%s" <%s>' % (
+                self.full_name,
+                self.email
+            ))
         return self.email
     mail_format.short_description = _('mail format')
 
@@ -84,7 +88,7 @@ class Contact(models.Model):
             contact_name = self.full_name
         else:
             contact_name = self.email
-        return contact_name
+        return smart_unicode(contact_name)
 
     class Meta:
         ordering = ('creation_date',)
@@ -130,13 +134,10 @@ class ContactMailingStatus(models.Model):
         verbose_name_plural = _('contact mailing statuses')
 
 
-
 class MailingList(models.Model):
     """Mailing list"""
     name = models.CharField(_('name'), max_length=255)
     description = models.TextField(_('description'), blank=True)
-    
-    public = models.BooleanField(_('public'), default=False)
 
     subscribers = models.ManyToManyField(
         Contact, verbose_name=_('subscribers'),
@@ -159,8 +160,7 @@ class MailingList(models.Model):
     unsubscribers_count.short_description = _('unsubscribers')
 
     def expedition_set(self):
-        unsubscribers_id = self.unsubscribers.values_list('id', flat=True)
-        return self.subscribers.valid_subscribers().exclude(id__in=unsubscribers_id)
+        return self.subscribers.verified_subscribers()
 
     def __unicode__(self):
         return self.name
@@ -169,25 +169,6 @@ class MailingList(models.Model):
         ordering = ('-creation_date',)
         verbose_name = _('mailing list')
         verbose_name_plural = _('mailing lists')
-
-
-class MailingListSegment(models.Model):
-    """ 
-    TODO: Work out what this class/model does now
-    """
-    name = models.CharField(_('name'), max_length=255)
-    mailing_list = models.ForeignKey(MailingList, null=False, related_name="segments")
-    position = models.IntegerField(default=1)
-    subscribers = models.ManyToManyField(Contact, verbose_name=_('subscribers'))
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta:
-        ordering = ('position', )
-
-    def subscribers_count(self):
-        return self.subscribers.all().count()
 
 
 class Newsletter(models.Model):
@@ -209,16 +190,14 @@ class Newsletter(models.Model):
     title = models.CharField(
         _('title'),
         max_length=255,
-        help_text=_('You can use the "{{ UNIQUE_KEY }}" variable for unique identifier within the newsletter\'s title.')
+        help_text=_('')
     )
     content = models.TextField(
-        _('content'), help_text=_('Or paste an URL.'), default=_('<!-- Edit your newsletter here -->')
+        _('content'), help_text=_(''), default=_('<!-- Edit your newsletter here -->')
     )
 
     template = models.CharField(verbose_name=_('template'), max_length=200, choices=get_templates())
     base_url = models.CharField(verbose_name=_('base URL'), max_length=200, null=True, blank=True)
-
-    public = models.BooleanField(_('public'), default=False)
 
     mailing_list = models.ForeignKey(MailingList, verbose_name=_('mailing list'), null=True)
     test_contacts = models.ManyToManyField(Contact, verbose_name=_('test contacts'), blank=True, null=True)
@@ -243,9 +222,7 @@ class Newsletter(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        if self.public:
-            return ('newsletter_newsletter_public', (self.slug,))
-        return ('newsletter_newsletter_preview', (self.slug,))
+        return ('newsletter_newsletter_public', (self.slug,))
 
     @models.permalink
     def get_historic_url(self):
@@ -288,39 +265,39 @@ class Newsletter(models.Model):
 
         return False
 
-    @property
-    def attachments(self):
-        if not self._attachments_done:            
-            self._attachments = []
-            for attachment in self.attachment_set.all():
-                ctype, encoding = mimetypes.guess_type(attachment.file_attachment.path)
+    # @property
+    # def attachments(self):
+    #     if not self._attachments_done:
+    #         self._attachments = []
+    #         for attachment in self.attachment_set.all():
+    #             ctype, encoding = mimetypes.guess_type(attachment.file_attachment.path)
+    #
+    #             if ctype is None or encoding is not None:
+    #                 ctype = 'application/octet-stream'
+    #
+    #             maintype, subtype = ctype.split('/', 1)
+    #
+    #             fd = open(attachment.file_attachment.path, 'rb')
+    #             if maintype == 'text':
+    #                 message_attachment = MIMEText(fd.read(), _subtype=subtype)
+    #             elif maintype == 'message':
+    #                 message_attachment = message_from_file(fd)
+    #             elif maintype == 'image':
+    #                 message_attachment = MIMEImage(fd.read(), _subtype=subtype)
+    #             elif maintype == 'audio':
+    #                 message_attachment = MIMEAudio(fd.read(), _subtype=subtype)
+    #             else:
+    #                 message_attachment = MIMEBase(maintype, subtype)
+    #                 message_attachment.set_payload(fd.read())
+    #                 encode_base64(message_attachment)
+    #             fd.close()
+    #
+    #             message_attachment.add_header('Content-Disposition', 'attachment', filename=attachment.title)
+    #             self._attachments.append(message_attachment)
+    #
+    #     return self._attachments
 
-                if ctype is None or encoding is not None:
-                    ctype = 'application/octet-stream'
-
-                maintype, subtype = ctype.split('/', 1)
-
-                fd = open(attachment.file_attachment.path, 'rb')
-                if maintype == 'text':
-                    message_attachment = MIMEText(fd.read(), _subtype=subtype)
-                elif maintype == 'message':
-                    message_attachment = message_from_file(fd)
-                elif maintype == 'image':
-                    message_attachment = MIMEImage(fd.read(), _subtype=subtype)
-                elif maintype == 'audio':
-                    message_attachment = MIMEAudio(fd.read(), _subtype=subtype)
-                else:
-                    message_attachment = MIMEBase(maintype, subtype)
-                    message_attachment.set_payload(fd.read())
-                    encode_base64(message_attachment)
-                fd.close()
-
-                message_attachment.add_header('Content-Disposition', 'attachment', filename=attachment.title)
-                self._attachments.append(message_attachment)
-
-        return self._attachments
-
-    def update_newsletter_status(self):        
+    def update_newsletter_status(self):
         if self.status == Newsletter.WAITING:
             self.status = Newsletter.SENDING
         if self.status == Newsletter.SENDING and self.mails_sent() >= \
@@ -330,8 +307,8 @@ class Newsletter(models.Model):
 
     def prepare_message(self, contact):
 
-        from emencia.utils.tokens import tokenize
-        from emencia.utils.newsletter import fix_tinymce_links
+        from edn.utils.tokens import tokenize
+        # from edn.utils.newsletter import fix_tinymce_links
 
         uidb36, token = tokenize(contact)
 
@@ -353,7 +330,7 @@ class Newsletter(models.Model):
         message.to = [contact.mail_format()]
 
         # Render only the message provided by the user with the WYSIWYG editor
-        message_template = Template(fix_tinymce_links(self.content))
+        message_template = Template(self.content)
         message_content = message_template.render(context)
 
         context.update({'message': message_content})
@@ -362,19 +339,17 @@ class Newsletter(models.Model):
         link_site = render_to_string('newsletter/newsletter_link_site.html', context)
         context.update({'link_site': link_site})
 
-        if INCLUDE_UNSUBSCRIPTION:
-            unsubscription = render_to_string('newsletter/newsletter_link_unsubscribe.html', context)
-            context.update({'unsubscription': unsubscription})
+        unsubscription = render_to_string('newsletter/newsletter_link_unsubscribe.html', context)
+        context.update({'unsubscription': unsubscription})
 
-        if TRACKING_IMAGE:
-            image_tracking = render_to_string('newsletter/newsletter_image_tracking.html', context)
-            context.update({'image_tracking': image_tracking})
+        image_tracking = render_to_string('newsletter/newsletter_image_tracking.html', context)
+        context.update({'image_tracking': image_tracking})
 
         content_template = get_template('mailtemplates/{0}/{1}'.format(self.template, 'index.html'))
         content = content_template.render(context)
 
         if TRACKING_LINKS:
-            from emencia.utils.newsletter import track_links
+            from edn.utils.newsletter import track_links
             content = track_links(content, context)
 
         content = smart_unicode(content)
@@ -382,20 +357,14 @@ class Newsletter(models.Model):
         p = Premailer(content, base_url=base_url, preserve_internal_links=True)
         content = p.transform()
 
-        # newsletter_template = Template(self.content) 
-
         message.body = html2text(content)
         message.attach_alternative(smart_str(content), "text/html")
-        
+
         title_template = Template(self.title)
         title = title_template.render(context)
         message.subject = title
-        
-        for attachment in self.attachments:
-            message.attach(attachment)
 
         return message
-
 
     def update_contact_status(self, contact, state):
         if state == ContactMailingStatus.INVALID:
@@ -447,7 +416,7 @@ class Newsletter(models.Model):
 
 
 class Link(models.Model):
-    """Link sended in a newsletter"""
+    """Link sent in a newsletter"""
     title = models.CharField(_('title'), max_length=255)
     url = models.CharField(_('url'), max_length=255)
 
@@ -465,43 +434,26 @@ class Link(models.Model):
         verbose_name_plural = _('links')
 
 
-class Attachment(models.Model):
-    """Attachment file in a newsletter"""
-
-    def get_newsletter_storage_path(self, filename):
-        filename = force_unicode(filename)
-        return '/'.join([BASE_PATH, self.newsletter.slug, filename])
-
-    newsletter = models.ForeignKey(Newsletter, verbose_name=_('newsletter'))
-    title = models.CharField(_('title'), max_length=255)
-    file_attachment = models.FileField(_('file to attach'), max_length=255, upload_to=get_newsletter_storage_path)
-
-    class Meta:
-        verbose_name = _('attachment')
-        verbose_name_plural = _('attachments')
-
-    def __unicode__(self):
-        return self.title
-
-    def get_absolute_url(self):
-        return self.file_attachment.url
-
-class WorkGroup(models.Model):
-    """
-    Work Group for privatization of the resources
-    """
-    name = models.CharField(_('name'), max_length=255)
-    group = models.ForeignKey(Group, verbose_name=_('permissions group'))
-    contacts = models.ManyToManyField(Contact, verbose_name=_('contacts'), blank=True, null=True)
-    mailinglists = models.ManyToManyField(MailingList, verbose_name=_('mailing lists'), blank=True, null=True)
-    newsletters = models.ManyToManyField(Newsletter, verbose_name=_('newsletters'), blank=True, null=True)
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = _('workgroup')
-        verbose_name_plural = _('workgroups')
+# class Attachment(models.Model):
+#     """Attachment file in a newsletter"""
+#
+#     def get_newsletter_storage_path(self, filename):
+#         filename = force_unicode(filename)
+#         return '/'.join([BASE_PATH, self.newsletter.slug, filename])
+#
+#     newsletter = models.ForeignKey(Newsletter, verbose_name=_('newsletter'))
+#     title = models.CharField(_('title'), max_length=255)
+#     file_attachment = models.FileField(_('file to attach'), max_length=255, upload_to=get_newsletter_storage_path)
+#
+#     class Meta:
+#         verbose_name = _('attachment')
+#         verbose_name_plural = _('attachments')
+#
+#     def __unicode__(self):
+#         return self.title
+#
+#     def get_absolute_url(self):
+#         return self.file_attachment.url
 
 
 class SubscriberVerification(models.Model):

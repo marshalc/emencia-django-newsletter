@@ -16,13 +16,10 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
-from emencia.models import MailingList
-from emencia.settings import USE_WORKGROUPS
-from emencia.utils.excel import ExcelResponse
-from emencia.utils.importing import import_dispatcher
-from emencia.utils.vcard import vcard_contacts_export_response
-from emencia.utils.workgroups import request_workgroups
-from emencia.utils.workgroups import request_workgroups_contacts_pk
+from edn.models import MailingList
+# from edn.utils.excel import ExcelResponse
+# from edn.utils.importing import import_dispatcher
+# from edn.utils.vcard import vcard_contacts_export_response
 
 
 contacts_imported = Signal(providing_args=['source', 'type'])
@@ -31,33 +28,32 @@ contacts_imported = Signal(providing_args=['source', 'type'])
 class ContactAdmin(admin.ModelAdmin):
     date_hierarchy = 'creation_date'
     list_display = (
-        'full_name', 'email', 'verified', 'tester', 'subscriber', 'valid', 'total_subscriptions',
-        'creation_date'
+        'full_name', 'email', 'verified', 'tester', 'total_subscriptions', 'creation_date'
     )
-    list_filter = ('subscriber', 'valid', 'verified', 'tester', 'creation_date', 'modification_date')
+    list_filter = ('verified', 'tester', 'creation_date', 'modification_date')
     search_fields = ('email', 'full_name')
     fieldsets = (
         (None, {'fields': ('email', 'full_name')}),
-        (_('Status'), {'fields': ('verified', 'subscriber', 'valid', 'tester')}),
+        (_('Status'), {'fields': ('verified', 'tester')}),
     )
-    actions = ['create_mailinglist', 'export_vcard', 'export_excel']
+    actions = ['create_mailinglist']  # , 'export_vcard', 'export_excel'
     actions_on_top = False
     actions_on_bottom = True
 
     def queryset(self, request):
         queryset = super(ContactAdmin, self).queryset(request)
-        if not request.user.is_superuser and USE_WORKGROUPS:
-            contacts_pk = request_workgroups_contacts_pk(request)
-            queryset = queryset.filter(pk__in=contacts_pk)
+        # if not request.user.is_superuser and USE_WORKGROUPS:
+        #     contacts_pk = request_workgroups_contacts_pk(request)
+        #     queryset = queryset.filter(pk__in=contacts_pk)
         return queryset
 
     def save_model(self, request, contact, form, change):
-        workgroups = []
-        if not contact.pk and not request.user.is_superuser and USE_WORKGROUPS:
-            workgroups = request_workgroups(request)
+        # workgroups = []
+        # if not contact.pk and not request.user.is_superuser and USE_WORKGROUPS:
+        #     workgroups = request_workgroups(request)
         contact.save()
-        for workgroup in workgroups:
-            workgroup.contacts.add(contact)
+        # for workgroup in workgroups:
+        #     workgroup.contacts.add(contact)
 
     def total_subscriptions(self, contact):
         """Display user subscriptions to unsubscriptions"""
@@ -66,17 +62,17 @@ class ContactAdmin(admin.ModelAdmin):
         return '%s / %s' % (subscriptions - unsubscriptions, subscriptions)
     total_subscriptions.short_description = _('Total subscriptions')
 
-    def export_vcard(self, request, queryset, export_name=''):
-        """Export selected contact in VCard"""
-        return vcard_contacts_export_response(queryset)
-    export_vcard.short_description = _('Export contacts as VCard')
-
-    def export_excel(self, request, queryset, export_name=''):
-        """Export selected contact in Excel"""
-        if not export_name:
-            export_name = 'contacts_edn_%s' % datetime.now().strftime('%d-%m-%Y')
-        return ExcelResponse(queryset, export_name)
-    export_excel.short_description = _('Export contacts in Excel')
+    # def export_vcard(self, request, queryset, export_name=''):
+    #     """Export selected contact in VCard"""
+    #     return vcard_contacts_export_response(queryset)
+    # export_vcard.short_description = _('Export contacts as VCard')
+    #
+    # def export_excel(self, request, queryset, export_name=''):
+    #     """Export selected contact in Excel"""
+    #     if not export_name:
+    #         export_name = 'contacts_edn_%s' % datetime.now().strftime('%d-%m-%Y')
+    #     return ExcelResponse(queryset, export_name)
+    # export_excel.short_description = _('Export contacts in Excel')
 
     def create_mailinglist(self, request, queryset):
         """Create a mailing list from selected contact"""
@@ -98,9 +94,9 @@ class ContactAdmin(admin.ModelAdmin):
         except DatabaseError:
             new_mailing.subscribers = queryset.none()
 
-        if not request.user.is_superuser and USE_WORKGROUPS:
-            for workgroup in request_workgroups(request):
-                workgroup.mailinglists.add(new_mailing)
+        # if not request.user.is_superuser and USE_WORKGROUPS:
+        #     for workgroup in request_workgroups(request):
+        #         workgroup.mailinglists.add(new_mailing)
 
         self.message_user(request, _('%s succesfully created.') % new_mailing)
         urlname = 'admin:%s_mailinglist_change' % self.opts.app_label
@@ -108,31 +104,31 @@ class ContactAdmin(admin.ModelAdmin):
 
     create_mailinglist.short_description = _('Create a mailinglist')
 
-    def importation(self, request):
-        """Import contacts from a VCard"""
-        opts = self.model._meta
-
-        if request.POST:
-            source = request.FILES.get('source') or StringIO.StringIO(request.POST.get('source', ''))
-            if not request.user.is_superuser and USE_WORKGROUPS:
-                workgroups = request_workgroups(request)
-            else:
-                workgroups = []
-            inserted = import_dispatcher(source, request.POST['type'], workgroups, None)
-            if inserted:
-                contacts_imported.send(sender=self, source=source, type=request.POST['type'])
-
-            self.message_user(
-                request, _('%s contacts succesfully imported.') % inserted
-            )
-
-        context = {'title': _('Contact importation'),
-                   'opts': opts,
-                   #~ 'root_path': self.admin_site.root_path,  TODO: Investigate this further
-                   'root_path': reverse('admin:index'),
-                   'app_label': opts.app_label}
-
-        return render_to_response('newsletter/contact_import.html', context, RequestContext(request))
+    # def importation(self, request):
+    #     """Import contacts from a VCard"""
+    #     opts = self.model._meta
+    #
+    #     if request.POST:
+    #         source = request.FILES.get('source') or StringIO.StringIO(request.POST.get('source', ''))
+    #         if not request.user.is_superuser and USE_WORKGROUPS:
+    #             workgroups = request_workgroups(request)
+    #         else:
+    #             workgroups = []
+    #         inserted = import_dispatcher(source, request.POST['type'], workgroups, None)
+    #         if inserted:
+    #             contacts_imported.send(sender=self, source=source, type=request.POST['type'])
+    #
+    #         self.message_user(
+    #             request, _('%s contacts succesfully imported.') % inserted
+    #         )
+    #
+    #     context = {'title': _('Contact importation'),
+    #                'opts': opts,
+    #                #~ 'root_path': self.admin_site.root_path,  TODO: Investigate this further
+    #                'root_path': reverse('admin:index'),
+    #                'app_label': opts.app_label}
+    #
+    #     return render_to_response('newsletter/contact_import.html', context, RequestContext(request))
 
     def filtered_request_queryset(self, request):
         """Return queryset filtered by the admin list view"""
@@ -147,19 +143,19 @@ class ContactAdmin(admin.ModelAdmin):
         """Create a mailing list form the filtered contacts"""
         return self.create_mailinglist(request, self.filtered_request_queryset(request))
 
-    def exportation_vcard(self, request):
-        """Export filtered contacts in VCard"""
-        return self.export_vcard(
-            request, self.filtered_request_queryset(request),
-            'contacts_edn_%s' % datetime.now().strftime('%d-%m-%Y')
-        )
+    # def exportation_vcard(self, request):
+    #     """Export filtered contacts in VCard"""
+    #     return self.export_vcard(
+    #         request, self.filtered_request_queryset(request),
+    #         'contacts_edn_%s' % datetime.now().strftime('%d-%m-%Y')
+    #     )
 
-    def exportation_excel(self, request):
-        """Export filtered contacts in Excel"""
-        return self.export_excel(
-            request, self.filtered_request_queryset(request),
-            'contacts_edn_%s' % datetime.now().strftime('%d-%m-%Y')
-        )
+    # def exportation_excel(self, request):
+    #     """Export filtered contacts in Excel"""
+    #     return self.export_excel(
+    #         request, self.filtered_request_queryset(request),
+    #         'contacts_edn_%s' % datetime.now().strftime('%d-%m-%Y')
+    #     )
 
     def get_urls(self):
         urls = super(ContactAdmin, self).get_urls()

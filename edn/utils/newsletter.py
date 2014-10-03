@@ -5,9 +5,7 @@ from bs4 import BeautifulSoup
 
 from django.core.urlresolvers import reverse
 
-from emencia.settings import TRACKING_IGNORE_ANCHOR
-from emencia.settings import USE_PRETTIFY
-from emencia.models import Link
+from edn.models import Link
 
 ###  Moot since all emails are now template based?
 # def body_insertion(content, insertion, end=False):
@@ -38,9 +36,6 @@ def track_links(content, context):
     soup = BeautifulSoup(content)
     for link_markup in soup('a'):
         if link_markup.get('href') and 'no-track' not in link_markup.get('rel', ''):
-            if TRACKING_IGNORE_ANCHOR:
-                if '#' in link_markup.get('href')[0]:
-                    continue
             link_href = link_markup['href']
 
             if link_href.startswith("http"):
@@ -54,12 +49,9 @@ def track_links(content, context):
                     )
                 )
 
-    if USE_PRETTIFY:
-        return soup.prettify()
-    else:
-        return soup.renderContents()
+    return soup.prettify()
 
 
-def fix_tinymce_links(content):
-    """ Clean the src attribute of images in content edited with TinyMCE and django-filebrowser"""
-    return re.sub(r'(\.\.\/)+', '/', content)
+# def fix_tinymce_links(content):
+#     """ Clean the src attribute of images in content edited with TinyMCE and django-filebrowser"""
+#     return re.sub(r'(\.\.\/)+', '/', content)

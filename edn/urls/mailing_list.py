@@ -1,16 +1,16 @@
 """
-Urls for the emencia Mailing List
+Urls for the edn Mailing List
 """
 from django.conf.urls import patterns
 from django.conf.urls import url
 
-from emencia.forms import AllMailingListSubscriptionForm
-from emencia.forms import MailingListSubscriptionForm
-from emencia.forms import SubscriberVerificationForm
-from emencia.forms import VerificationMailingListSubscriptionForm
+from edn.forms import AllMailingListSubscriptionForm
+from edn.forms import MailingListSubscriptionForm
+from edn.forms import SubscriberVerificationForm
+from edn.forms import VerificationMailingListSubscriptionForm
 
 urlpatterns = patterns(
-    'emencia.views.mailing_list',
+    'edn.views.mailing_list',
     url(
         r'^unsubscribe/(?P<slug>[-\w]+)/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         'view_mailinglist_unsubscribe',

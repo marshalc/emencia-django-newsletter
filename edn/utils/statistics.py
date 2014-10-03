@@ -1,7 +1,7 @@
-"""Statistics for emencia"""
+"""Statistics for edn"""
 from django.db.models import Q
 
-from emencia.models import ContactMailingStatus as Status
+from edn.models import ContactMailingStatus as Status
 
 
 def smart_division(a, b):

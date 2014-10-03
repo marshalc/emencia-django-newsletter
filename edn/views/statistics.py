@@ -1,4 +1,4 @@
-"""Views for emencia statistics"""
+"""Views for edn statistics"""
 import csv
 
 from datetime import timedelta
@@ -13,13 +13,13 @@ from django.template.defaultfilters import date
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
-from emencia.models import Newsletter
-from emencia.models import ContactMailingStatus
-from emencia.utils.ofc import Chart
-from emencia.utils.statistics import get_newsletter_top_links
-from emencia.utils.statistics import get_newsletter_statistics
-from emencia.utils.statistics import get_newsletter_opening_statistics
-from emencia.utils.statistics import get_newsletter_clicked_link_statistics
+from edn.models import Newsletter
+from edn.models import ContactMailingStatus
+from edn.utils.ofc import Chart
+from edn.utils.statistics import get_newsletter_top_links
+from edn.utils.statistics import get_newsletter_statistics
+from edn.utils.statistics import get_newsletter_opening_statistics
+from edn.utils.statistics import get_newsletter_clicked_link_statistics
 
 BG_COLOR = '#ffffff'
 GRID_COLOR = '#eeeeee'
@@ -65,7 +65,7 @@ def view_newsletter_statistics(request, slug):
     }
 
     return render_to_response(
-        'newsletter/newsletter_statistics.html',
+        'views/newsletter_statistics.html',
         context,
         context_instance=RequestContext(request)
     )
@@ -121,7 +121,7 @@ def view_newsletter_density(request, slug):
     )
     context = {'object': newsletter, 'top_links': get_newsletter_top_links(status)['top_links']}
 
-    return render_to_response('newsletter/newsletter_density.html', context, context_instance=RequestContext(request))
+    return render_to_response('views/newsletter_density.html', context, context_instance=RequestContext(request))
 
 
 @staff_member_required

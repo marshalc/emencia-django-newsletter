@@ -1,10 +1,8 @@
-"""Forms for emencia"""
+"""Forms for edn"""
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from emencia.models import Contact
-from emencia.models import MailingList
-from emencia.models import SubscriberVerification
+from edn.models import Contact, MailingList, SubscriberVerification
 
 
 class MailingListSubscriptionForm(forms.ModelForm):
@@ -89,4 +87,4 @@ class SubscriberVerificationForm(forms.ModelForm):
     """
     class Meta:
         model = Contact
-        exclude = ('verified', 'subscriber', 'valid', 'tester')
+        exclude = ('verified', 'tester')

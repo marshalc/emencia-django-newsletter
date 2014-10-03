@@ -1,4 +1,4 @@
-"""Managers for emencia"""
+"""Managers for edn"""
 from django.db import models
 
 
@@ -13,10 +13,6 @@ class ContactManager(models.Manager):
         """Return all unsubscribers"""
         return self.get_query_set().filter(subscriber=False)
 
-    def valids(self):
-        """Return only valid contacts"""
-        return self.get_query_set().filter(valid=True)
-
-    def valid_subscribers(self):
-        """Return only valid subscribers"""
-        return self.subscribers().filter(valid=True)
+    def verified_subscribers(self):
+        """Return only verified contacts"""
+        return self.subscribers().filter(verified=True)

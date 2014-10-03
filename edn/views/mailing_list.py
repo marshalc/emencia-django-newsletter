@@ -1,5 +1,5 @@
 """
-Views for emencia Mailing List and Subscriber Verification
+Views for edn Mailing List and Subscriber Verification
 """
 import re
 from StringIO import StringIO
@@ -9,12 +9,12 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import Context, RequestContext
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_str
-from html2text import html2text as html2text_orig
 
-from emencia.signals import contact_unsubscribed
-from emencia.models import Newsletter, MailingList, ContactMailingStatus, SubscriberVerification
-from emencia.settings import DEFAULT_HEADER_REPLY, UNSUBSCRIBE_ALL, AUTO_SUBSCRIBE_TO_ONLY_LIST, AUTO_SUBSCRIBE_LIST_NAME
-from emencia.utils.tokens import untokenize
+from edn.signals import contact_unsubscribed
+from edn.models import Newsletter, MailingList, ContactMailingStatus, SubscriberVerification
+from edn.settings import DEFAULT_HEADER_REPLY, UNSUBSCRIBE_ALL
+from edn.utils.tokens import untokenize
+from edn.utils import html2text
 
 
 def view_mailinglist_unsubscribe(request, slug, uidb36, token):
@@ -49,7 +49,7 @@ def view_mailinglist_unsubscribe(request, slug, uidb36, token):
         )
 
     return render_to_response(
-        'newsletter/mailing_list_unsubscribe.html',
+        'views/mailing_list_unsubscribe.html',
         {'email': contact.email, 'unsubscribed_count':unsubscribed, 'already_unsubscribed': already_unsubscribed},
         context_instance=RequestContext(request)
     )
@@ -73,29 +73,11 @@ def view_mailinglist_subscribe(request, form_class, mailing_list_id=None, link_i
         form = form_class()
 
     return render_to_response(
-        'newsletter/mailing_list_subscribe.html',
+        'views/mailing_list_subscribe.html',
         {'subscribed': subscribed, 'mailing_list': mailing_list, 'form': form},
         context_instance=RequestContext(request)
     )
 
-LINK_RE = re.compile(r"https?://([^ \n]+\n)+[^ \n]+", re.MULTILINE)
-
-
-def html2text(html):
-    """
-    Use html2text but repair newlines cutting urls.
-    Need to use this hack until https://github.com/aaronsw/html2text/issues/#issue/7 is not fixed
-    """
-    txt = html2text_orig(html)
-    links = list(LINK_RE.finditer(txt))
-    out = StringIO()
-    pos = 0
-    for l in links:
-        out.write(txt[pos:l.start()])
-        out.write(l.group().replace('\n', ''))
-        pos = l.end()
-    out.write(txt[pos:])
-    return out.getvalue()
 
 def _view_subscriber_verification_context(request, form_class):
 
@@ -119,7 +101,7 @@ def _view_subscriber_verification_context(request, form_class):
                 'link_id': link_id,
             })
 
-            content_html = render_to_string('newsletter/newsletter_mail_verification.html', mail_context)
+            content_html = render_to_string('views/newsletter_mail_verification.html', mail_context)
 
             content_text = html2text(content_html)
 
@@ -128,7 +110,7 @@ def _view_subscriber_verification_context(request, form_class):
             message.extra_headers = {'Reply-to': smart_str(DEFAULT_HEADER_REPLY)}
             message.to = [smart_str(context['form'].instance.email)]
             
-            message.subject = render_to_string('newsletter/newsletter_mail_verification_subject.html', context)
+            message.subject = render_to_string('views/newsletter_mail_verification_subject.html', context)
 
             message.body = smart_str(content_text)
             message.attach_alternative(smart_str(content_html), "text/html")       
@@ -151,10 +133,11 @@ def view_subscriber_verification(request, form_class):
     context = _view_subscriber_verification_context(request, form_class)
     
     return render_to_response(
-        'newsletter/subscriber_verification.html',
+        'views/subscriber_verification.html',
         context,
         context_instance=RequestContext(request)
     )
+
 
 def _view_uuid_verification_context(request, link_id, form_class=None):
     context = {}
@@ -169,24 +152,24 @@ def _view_uuid_verification_context(request, link_id, form_class=None):
         subscription['contact'] = subscription['object'].contact
         ready = True
 
-        # If there is only one mailing list, subscribe the (now)
-        # verified user to it
-        if AUTO_SUBSCRIBE_TO_ONLY_LIST:
-            if context['mailing_list_count'] == 1:
-                mailing_list = mailinglists.get()
-                mailing_list.subscribers.add(subscription['contact'].id)
-                mailing_list.unsubscribers.remove(subscription['contact'].id)
-
-        if AUTO_SUBSCRIBE_LIST_NAME is not None:
-            if isinstance(AUTO_SUBSCRIBE_LIST_NAME, basestring):
-                lists = [AUTO_SUBSCRIBE_LIST_NAME]
-            else:
-                lists = AUTO_SUBSCRIBE_LIST_NAME
-
-            mls = mailinglists.filter(name__in=lists)
-            for ml in mls:
-                ml.subscribers.add(subscription['contact'].id)
-                ml.unsubscribers.remove(subscription['contact'].id)
+        # # If there is only one mailing list, subscribe the (now)
+        # # verified user to it
+        # if AUTO_SUBSCRIBE_TO_ONLY_LIST:
+        #     if context['mailing_list_count'] == 1:
+        #         mailing_list = mailinglists.get()
+        #         mailing_list.subscribers.add(subscription['contact'].id)
+        #         mailing_list.unsubscribers.remove(subscription['contact'].id)
+        #
+        # if AUTO_SUBSCRIBE_LIST_NAME is not None:
+        #     if isinstance(AUTO_SUBSCRIBE_LIST_NAME, basestring):
+        #         lists = [AUTO_SUBSCRIBE_LIST_NAME]
+        #     else:
+        #         lists = AUTO_SUBSCRIBE_LIST_NAME
+        #
+        #     mls = mailinglists.filter(name__in=lists)
+        #     for ml in mls:
+        #         ml.subscribers.add(subscription['contact'].id)
+        #         ml.unsubscribers.remove(subscription['contact'].id)
 
         if request.POST:
             form = form_class(request.POST)
@@ -208,6 +191,7 @@ def _view_uuid_verification_context(request, link_id, form_class=None):
 
     return context
 
+
 def view_uuid_verification(request, link_id, form_class=None):
     """
     A simple view that shows if verification is true or false.
@@ -216,7 +200,7 @@ def view_uuid_verification(request, link_id, form_class=None):
     context = _view_uuid_verification_context(request, link_id, form_class)
 
     return render_to_response(
-        'newsletter/uuid_verification.html',
+        'views/uuid_verification.html',
         context,
         context_instance=RequestContext(request)
     )

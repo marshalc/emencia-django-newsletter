@@ -4,7 +4,7 @@ import os
 from django.conf import settings
 from django.http import HttpResponse
 
-from emencia.settings import NEWSLETTER_TINYMCE_TEMPLATE_DIR
+from edn.settings import NEWSLETTER_TINYMCE_TEMPLATE_DIR
 
 try:
     from filebrowser.base import FileObject

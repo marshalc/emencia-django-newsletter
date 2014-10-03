@@ -1,4 +1,4 @@
-"""Views for emencia Tracking"""
+"""Views for edn Tracking"""
 import base64
 
 from django.contrib.admin.views.decorators import staff_member_required
@@ -10,12 +10,10 @@ from django.template import RequestContext
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
-from emencia.models import ContactMailingStatus
-from emencia.models import Link
-from emencia.models import Newsletter
-from emencia.settings import USE_UTM_TAGS
-from emencia.settings import TRACKING_IMAGE
-from emencia.utils.tokens import untokenize
+from edn.models import ContactMailingStatus, Link, Newsletter
+from edn.settings import USE_UTM_TAGS
+from edn.settings import TRACKING_IMAGE
+from edn.utils.tokens import untokenize
 
 from urllib import urlencode
 from urlparse import urlparse
@@ -67,4 +65,4 @@ def view_newsletter_historic(request, slug):
         'object_id': newsletter.pk,
         'app_label': opts.app_label
     }
-    return render_to_response('newsletter/newsletter_historic.html', context, context_instance=RequestContext(request))
+    return render_to_response('views/newsletter_historic.html', context, context_instance=RequestContext(request))

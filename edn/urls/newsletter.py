@@ -1,11 +1,11 @@
 """
-Urls for the emencia Newsletter
+Urls for the edn Newsletter
 """
 from django.conf.urls import url
 from django.conf.urls import patterns
 
 urlpatterns = patterns(
-    'emencia.views.newsletter',
+    'edn.views.newsletter',
     url(r'^preview/(?P<slug>[-\w]+)/$', 'view_newsletter_preview', name='newsletter_newsletter_preview'),
     url(r'^public/(?P<slug>[-\w]+)/$', 'view_newsletter_public', name='newsletter_newsletter_public'),
     url(

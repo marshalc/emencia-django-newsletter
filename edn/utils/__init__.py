@@ -1,4 +1,4 @@
-"""Utils for emencia"""
+"""Utils for edn"""
 from django.template import Context, Template
 import re
 from html2text import html2text as html2text_orig

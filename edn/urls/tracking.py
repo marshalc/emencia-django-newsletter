@@ -1,11 +1,11 @@
 """
-Urls for the emencia Tracking
+Urls for the edn Tracking
 """
 from django.conf.urls import patterns
 from django.conf.urls import url
 
 urlpatterns = patterns(
-    'emencia.views.tracking',
+    'edn.views.tracking',
     url(
         r'^newsletter/(?P<slug>[-\w]+)/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)\.(?P<format>png|gif|jpg)$',
         'view_newsletter_tracking',

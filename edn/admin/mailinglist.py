@@ -12,25 +12,16 @@ from django.shortcuts import get_object_or_404
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 
-from emencia.models import Contact
-from emencia.models import MailingList
-from emencia.settings import USE_WORKGROUPS
-from emencia.utils.excel import ExcelResponse
-from emencia.utils.vcard import vcard_contacts_export_response
-from emencia.utils.workgroups import request_workgroups
-from emencia.utils.workgroups import request_workgroups_contacts_pk
-from emencia.utils.workgroups import request_workgroups_mailinglists_pk
-
+from edn.models import Contact, MailingList
 
 class MailingListAdmin(admin.ModelAdmin):
     date_hierarchy = 'creation_date'
-    list_display = ('name', 'public', 'creation_date', 'description', 'subscribers_count', 'unsubscribers_count',
-                    'export_links')
+    list_display = ('name', 'creation_date', 'description', 'subscribers_count', 'unsubscribers_count')
     list_filter = ('creation_date', 'modification_date')
     search_fields = ('name', 'description',)
     filter_horizontal = ['subscribers', 'unsubscribers']
     fieldsets = (
-        (None, {'fields': ('name', 'description', 'public',)}),
+        (None, {'fields': ('name', 'description',)}),
         (None, {'fields': ('subscribers',)}),
         (None, {'fields': ('unsubscribers',)}),
     )
@@ -40,30 +31,22 @@ class MailingListAdmin(admin.ModelAdmin):
 
     def queryset(self, request):
         queryset = super(MailingListAdmin, self).queryset(request)
-        if not request.user.is_superuser and USE_WORKGROUPS:
-            mailinglists_pk = request_workgroups_mailinglists_pk(request)
-            queryset = queryset.filter(pk__in=mailinglists_pk)
         return queryset
 
     def save_model(self, request, mailinglist, form, change):
-        workgroups = []
-        if not mailinglist.pk and not request.user.is_superuser and USE_WORKGROUPS:
-            workgroups = request_workgroups(request)
         mailinglist.save()
-        for workgroup in workgroups:
-            workgroup.mailinglists.add(mailinglist)
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if 'subscribers' in db_field.name and not request.user.is_superuser and USE_WORKGROUPS:
-            contacts_pk = request_workgroups_contacts_pk(request)
-            kwargs['queryset'] = Contact.objects.filter(pk__in=contacts_pk)
+        # if 'subscribers' in db_field.name and not request.user.is_superuser and USE_WORKGROUPS:
+        #     contacts_pk = request_workgroups_contacts_pk(request)
+        #     kwargs['queryset'] = Contact.objects.filter(pk__in=contacts_pk)
         return super(MailingListAdmin, self).formfield_for_manytomany(
             db_field, request, **kwargs)
 
     def merge_mailinglist(self, request, queryset):
         """Merge multiple mailing list"""
         if queryset.count() == 1:
-            self.message_user(request, _('Please select a least 2 mailing list.'))
+            self.message_user(request, _('Please select at least 2 mailing lists.'))
             return None
 
         subscribers = {}
@@ -81,36 +64,32 @@ class MailingListAdmin(admin.ModelAdmin):
         new_mailing.subscribers = subscribers.keys()
         new_mailing.unsubscribers = unsubscribers.keys()
 
-        if not request.user.is_superuser and USE_WORKGROUPS:
-            for workgroup in request_workgroups(request):
-                workgroup.mailinglists.add(new_mailing)
-
-        self.message_user(request, _('%s succesfully created by merging.') % new_mailing)
+        self.message_user(request, _('%s successfully created by merging.') % new_mailing)
         urlname = 'admin:%s_mailinglist_change' % self.opts.app_label
         return HttpResponseRedirect(reverse(urlname, args=[new_mailing.pk]))
     merge_mailinglist.short_description = _('Merge selected mailinglists')
 
-    def export_links(self, mailinglist):
-        """Display links for export"""
-        return u'<a href="%s">%s</a> / <a href="%s">%s</a>' % (
-            reverse('admin:%s_mailinglist_export_excel' % self.opts.app_label,
-                    args=[mailinglist.pk]), _('Excel'),
-            reverse('admin:%s_mailinglist_export_vcard' % self.opts.app_label,
-                    args=[mailinglist.pk]), _('VCard'))
-    export_links.allow_tags = True
-    export_links.short_description = _('Export')
+    # def export_links(self, mailinglist):
+    #     """Display links for export"""
+    #     return u'<a href="%s">%s</a> / <a href="%s">%s</a>' % (
+    #         reverse('admin:%s_mailinglist_export_excel' % self.opts.app_label,
+    #                 args=[mailinglist.pk]), _('Excel'),
+    #         reverse('admin:%s_mailinglist_export_vcard' % self.opts.app_label,
+    #                 args=[mailinglist.pk]), _('VCard'))
+    # export_links.allow_tags = True
+    # export_links.short_description = _('Export')
 
-    def exportion_vcard(self, request, mailinglist_id):
-        """Export subscribers in the mailing in VCard"""
-        mailinglist = get_object_or_404(MailingList, pk=mailinglist_id)
-        name = 'contacts_%s' % smart_str(mailinglist.name)
-        return vcard_contacts_export_response(mailinglist.subscribers.all(), name)
+    # def exportion_vcard(self, request, mailinglist_id):
+    #     """Export subscribers in the mailing in VCard"""
+    #     mailinglist = get_object_or_404(MailingList, pk=mailinglist_id)
+    #     name = 'contacts_%s' % smart_str(mailinglist.name)
+    #     return vcard_contacts_export_response(mailinglist.subscribers.all(), name)
 
-    def exportion_excel(self, request, mailinglist_id):
-        """Export subscribers in the mailing in Excel"""
-        mailinglist = get_object_or_404(MailingList, pk=mailinglist_id)
-        name = 'contacts_%s' % smart_str(mailinglist.name)
-        return ExcelResponse(mailinglist.subscribers.all(), name)
+    # def exportion_excel(self, request, mailinglist_id):
+    #     """Export subscribers in the mailing in Excel"""
+    #     mailinglist = get_object_or_404(MailingList, pk=mailinglist_id)
+    #     name = 'contacts_%s' % smart_str(mailinglist.name)
+    #     return ExcelResponse(mailinglist.subscribers.all(), name)
 
     def get_urls(self):
         urls = super(MailingListAdmin, self).get_urls()

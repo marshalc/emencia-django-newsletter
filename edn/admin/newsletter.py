@@ -8,25 +8,10 @@ from django.db.models import Q
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
-from emencia.models import Contact
-from emencia.models import Newsletter
-from emencia.models import Attachment
-from emencia.models import MailingList
-from emencia.settings import USE_TINYMCE, USE_CKEDITOR
-from emencia.settings import USE_WORKGROUPS
-from emencia.settings import DEFAULT_HEADER_SENDER
-from emencia.settings import DEFAULT_HEADER_REPLY
-from emencia.settings import TINYMCE_WIDGET_ATTRS
-from emencia.utils.workgroups import request_workgroups
-from emencia.utils.workgroups import request_workgroups_contacts_pk
-from emencia.utils.workgroups import request_workgroups_newsletters_pk
-from emencia.utils.workgroups import request_workgroups_mailinglists_pk
+from tinymce.widgets import TinyMCE
 
-
-class AttachmentAdminInline(admin.TabularInline):
-    model = Attachment
-    extra = 1
-    fieldsets = ((None, {'fields': (('title', 'file_attachment'))}),)
+from edn.models import Contact, Newsletter
+from edn.settings import DEFAULT_HEADER_SENDER, DEFAULT_HEADER_REPLY, TINYMCE_WIDGET_ATTRS
 
 
 class BaseNewsletterAdmin(admin.ModelAdmin):
@@ -42,23 +27,20 @@ class BaseNewsletterAdmin(admin.ModelAdmin):
         (_('Sending'), {'fields': ('sending_date', 'status',)}),
         (_('Miscellaneous'), {'fields': ('header_sender', 'header_reply', 'base_url'), 'classes': ('collapse',)}),
     )
-    inlines = (AttachmentAdminInline,)
+    # inlines = (AttachmentAdminInline,)
     actions = ['send_mail_test', 'make_ready_to_send', 'make_cancel_sending', 'duplicate']
     actions_on_top = False
     actions_on_bottom = True
 
     def get_actions(self, request):
         actions = super(BaseNewsletterAdmin, self).get_actions(request)
-        if not request.user.has_perm('emencia.can_change_status'):
+        if not request.user.has_perm('edn.can_change_status'):
             del actions['make_ready_to_send']
             del actions['make_cancel_sending']
         return actions
 
     def queryset(self, request):
         queryset = super(BaseNewsletterAdmin, self).queryset(request)
-        if not request.user.is_superuser and USE_WORKGROUPS:
-            newsletters_pk = request_workgroups_newsletters_pk(request)
-            queryset = queryset.filter(pk__in=newsletters_pk)
         return queryset
 
     def formfield_for_dbfield(self, field, **kwargs):
@@ -71,15 +53,15 @@ class BaseNewsletterAdmin(admin.ModelAdmin):
         return super(BaseNewsletterAdmin, self).formfield_for_dbfield(field, **kwargs)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'mailing_list' and not request.user.is_superuser and USE_WORKGROUPS:
-            mailinglists_pk = request_workgroups_mailinglists_pk(request)
-            kwargs['queryset'] = MailingList.objects.filter(pk__in=mailinglists_pk)
-            return db_field.formfield(**kwargs)
+        # if db_field.name == 'mailing_list' and not request.user.is_superuser and USE_WORKGROUPS:
+        #     mailinglists_pk = request_workgroups_mailinglists_pk(request)
+        #     kwargs['queryset'] = MailingList.objects.filter(pk__in=mailinglists_pk)
+        #     return db_field.formfield(**kwargs)
         return super(BaseNewsletterAdmin, self).formfield_for_foreignkey(
             db_field, request, **kwargs)
 
     def formfield_for_choice_field(self, db_field, request, **kwargs):
-        if db_field.name == 'status' and not request.user.has_perm('emencia.can_change_status'):
+        if db_field.name == 'status' and not request.user.has_perm('edn.can_change_status'):
             kwargs['choices'] = ((Newsletter.DRAFT, _('Default')),)
             return db_field.formfield(**kwargs)
         return super(BaseNewsletterAdmin, self).formfield_for_choice_field(
@@ -88,28 +70,19 @@ class BaseNewsletterAdmin(admin.ModelAdmin):
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == 'test_contacts':
             queryset = Contact.objects.filter(tester=True)
-            if not request.user.is_superuser and USE_WORKGROUPS:
-                contacts_pk = request_workgroups_contacts_pk(request)
-                queryset = queryset.filter(pk__in=contacts_pk)
             kwargs['queryset'] = queryset
         return super(BaseNewsletterAdmin, self).formfield_for_manytomany(
             db_field, request, **kwargs)
 
     def save_model(self, request, newsletter, form, change):
         workgroups = []
-        if not newsletter.pk and not request.user.is_superuser and USE_WORKGROUPS:
-            workgroups = request_workgroups(request)
-
-        if not request.user.has_perm('emencia.can_change_status'):
+        if not request.user.has_perm('edn.can_change_status'):
             newsletter.status = form.initial.get('status', Newsletter.DRAFT)
 
         try:
             newsletter.save()
         except:
             self.message_user(request, _('Unable to download HTML, due to errors within.'))
-
-        for workgroup in workgroups:
-            workgroup.newsletters.add(newsletter)
 
     def historic_link(self, newsletter):
         """Display link for historic"""
@@ -135,21 +108,21 @@ class BaseNewsletterAdmin(admin.ModelAdmin):
             except HTMLParseError:
                 self.message_user(request, _('Unable send newsletter, due to errors within HTML.'))
                 continue
-            self.message_user(request, _('%s succesfully sent.') % newsletter)
+            self.message_user(request, _('%s successfully sent.') % newsletter)
     send_mail_test.short_description = _('Send test email')
 
     def make_ready_to_send(self, request, queryset):
         """Make newsletter ready to send"""
         from django.contrib import messages
         queryset.filter(status=Newsletter.DRAFT).update(status=Newsletter.WAITING)
-        messages.success(request, _('%s newletters are ready to send') % queryset.count())
+        messages.success(request, _('%s newsletters are ready to send') % queryset.count())
         # self.message_user(request, message)
     make_ready_to_send.short_description = _('Make ready to send')
 
     def make_cancel_sending(self, request, queryset):
         """Cancel the sending of newsletters"""
         queryset = queryset.filter(Q(status=Newsletter.WAITING) | Q(status=Newsletter.SENDING)).update(status=Newsletter.CANCELED)
-        self.message_user(request, _('%s newletters are cancelled') % queryset.count())
+        self.message_user(request, _('%s newsletters are cancelled') % queryset.count())
     make_cancel_sending.short_description = _('Cancel the sending')
 
     def duplicate(self, request, queryset):
@@ -167,33 +140,13 @@ class BaseNewsletterAdmin(admin.ModelAdmin):
                 att.newsletter = newsletter
                 att.save()
 
-if USE_TINYMCE:
-    from tinymce.widgets import TinyMCE
 
-    class NewsletterTinyMCEForm(forms.ModelForm):
-        content = forms.CharField(label=_('content'),
-            widget=TinyMCE(attrs=TINYMCE_WIDGET_ATTRS))
+class NewsletterTinyMCEForm(forms.ModelForm):
+    content = forms.CharField(label=_('content'),
+        widget=TinyMCE(attrs=TINYMCE_WIDGET_ATTRS))
 
-        class Meta:
-            model = Newsletter
+    class Meta:
+        model = Newsletter
 
     class NewsletterAdmin(BaseNewsletterAdmin):
         form = NewsletterTinyMCEForm
-        
-elif USE_CKEDITOR:
-    from ckeditor.widgets import CKEditorWidget
-    
-    class NewsletterCKEditorForm(forms.ModelForm):
-        content = forms.CharField(
-            widget=CKEditorWidget())
-
-        class Meta:
-            model = Newsletter
-
-    class NewsletterAdmin(BaseNewsletterAdmin):
-        form = NewsletterCKEditorForm
-    
-else:
-    class NewsletterAdmin(BaseNewsletterAdmin):
-        pass
-
