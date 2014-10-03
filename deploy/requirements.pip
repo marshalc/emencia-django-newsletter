@@ -1,6 +1,14 @@
 # Required includes
 Django >= 1.7
+beautifulsoup4 >=4.3.2      # For utils.newsletter.track_links
+premailer >= 2.6            # For models.Message.prepare_message
+# \ depends on: lxml cssselect cssutils
+html2text >= 2014.9.25      # For models.Message.prepare_message via utils.html2text
+django-tinymce >=1.5        # For admin.newsletter.NewsletterTinyMCEForm
 
+
+
+# \ depends on:
 
 # Optional includes?
 ipython >= 0.13
