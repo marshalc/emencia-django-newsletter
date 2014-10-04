@@ -40,7 +40,7 @@ class BaseNewsletterAdmin(admin.ModelAdmin):
         return actions
 
     def get_queryset(self, request):
-        queryset = super(BaseNewsletterAdmin, self).queryset(request)
+        queryset = super(BaseNewsletterAdmin, self).get_queryset(request)
         return queryset
 
     def formfield_for_dbfield(self, field, **kwargs):
@@ -147,6 +147,7 @@ class NewsletterTinyMCEForm(forms.ModelForm):
 
     class Meta:
         model = Newsletter
+        exclude = ()
 
 class NewsletterAdmin(BaseNewsletterAdmin):
     form = NewsletterTinyMCEForm

@@ -39,7 +39,7 @@ class ContactAdmin(admin.ModelAdmin):
     actions_on_bottom = True
 
     def get_queryset(self, request):
-        queryset = super(ContactAdmin, self).queryset(request)
+        queryset = super(ContactAdmin, self).get_queryset(request)
         # if not request.user.is_superuser and USE_WORKGROUPS:
         #     contacts_pk = request_workgroups_contacts_pk(request)
         #     queryset = queryset.filter(pk__in=contacts_pk)
@@ -96,7 +96,7 @@ class ContactAdmin(admin.ModelAdmin):
         #     for workgroup in request_workgroups(request):
         #         workgroup.mailinglists.add(new_mailing)
 
-        self.message_user(request, _('%s succesfully created.') % new_mailing)
+        self.message_user(request, _('%s successfully created.') % new_mailing)
         urlname = 'admin:%s_mailinglist_change' % self.opts.app_label
         return HttpResponseRedirect(reverse(urlname, args=[new_mailing.pk]))
 

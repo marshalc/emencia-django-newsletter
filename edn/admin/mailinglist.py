@@ -30,7 +30,7 @@ class MailingListAdmin(admin.ModelAdmin):
     actions_on_bottom = True
 
     def get_queryset(self, request):
-        queryset = super(MailingListAdmin, self).queryset(request)
+        queryset = super(MailingListAdmin, self).get_queryset(request)
         return queryset
 
     def save_model(self, request, mailinglist, form, change):
