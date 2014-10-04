@@ -9,7 +9,7 @@ class MailingListSubscriptionForm(forms.ModelForm):
     """
     Form for subscribing to a mailing list
     """
-    # Notes : This form will not check the uniquess of the 'email' field, by defining it explictly and setting
+    # Notes : This form will not check the uniqueness of the 'email' field, by defining it explicitly and setting
     # it the Meta.exclude list, for allowing registration to a mailing list even if the contact already exists.
     # Then the contact is always added to the subscribers field of the mailing list because it will be cleaned with no
     # double.
@@ -65,9 +65,9 @@ class VerificationMailingListSubscriptionForm(forms.Form):
     Form for subscribing to all mailing lists after verification
     """
     mailing_lists = forms.ModelMultipleChoiceField(
-        queryset=MailingList.objects.filter(public=True),
+        queryset=MailingList.objects.all(),
         initial=[
-            obj.id for obj in MailingList.objects.filter(public=True)
+            obj.id for obj in MailingList.objects.all()
         ],
         label=_('Mailing lists'),
         widget=forms.CheckboxSelectMultiple(),
@@ -80,6 +80,7 @@ class VerificationMailingListSubscriptionForm(forms.Form):
         for mailing_list in data['mailing_lists']:
             mailing_list.subscribers.add(Contact.objects.get(id=contact_id))
             mailing_list.unsubscribers.remove(Contact.objects.get(id=contact_id))
+
 
 class SubscriberVerificationForm(forms.ModelForm):
     """
