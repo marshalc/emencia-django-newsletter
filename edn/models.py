@@ -334,7 +334,7 @@ class Newsletter(models.Model):
         image_tracking = render_to_string('views/newsletter_image_tracking.html', context)
         context.update({'image_tracking': image_tracking})
 
-        content_template = get_template('mailtemplates/{0}/{1}'.format(self.template, 'index.html'))
+        content_template = get_template('mailouts/{0}/{1}'.format(self.template, 'index.html'))
         content = content_template.render(context)
 
         if TRACKING_LINKS:
