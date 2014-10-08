@@ -5,13 +5,9 @@ from django.db import models
 class ContactManager(models.Manager):
     """Manager for the contacts"""
 
-    def subscribers(self):
+    def unverified_subscribers(self):
         """Return all subscribers"""
-        return self.get_query_set().filter(subscriber=True)
-
-    def unsubscribers(self):
-        """Return all unsubscribers"""
-        return self.get_query_set().filter(subscriber=False)
+        return self.get_query_set().filter(verified=False)
 
     def verified_subscribers(self):
         """Return only verified contacts"""

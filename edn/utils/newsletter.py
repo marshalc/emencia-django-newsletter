@@ -1,29 +1,9 @@
 """Utils for newsletter"""
-import re
+# import re
 
 from bs4 import BeautifulSoup
-
 from django.core.urlresolvers import reverse
-
 from edn.models import Link
-
-###  Moot since all emails are now template based?
-# def body_insertion(content, insertion, end=False):
-#     """Insert an HTML content into the body HTML node"""
-#     if not content.startswith('<body'):
-#         content = '<body>%s</body>' % content
-#     soup = BeautifulSoup(content)
-#     insertion = BeautifulSoup(insertion)
-#
-#     if end:
-#         soup.body.append(insertion)
-#     else:
-#         soup.body.insert(0, insertion)
-#
-#     if USE_PRETTIFY:
-#         return soup.prettify()
-#     else:
-#         return soup.renderContents()
 
 
 def track_links(content, context):
@@ -50,8 +30,3 @@ def track_links(content, context):
                 )
 
     return soup.prettify()
-
-
-# def fix_tinymce_links(content):
-#     """ Clean the src attribute of images in content edited with TinyMCE and django-filebrowser"""
-#     return re.sub(r'(\.\.\/)+', '/', content)
