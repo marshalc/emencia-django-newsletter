@@ -39,7 +39,7 @@ def render_newsletter(request, slug, context):
     message = track_links(message, context)
 
     return render_to_response(
-        'mailtemplates/{0}/{1}'.format(newsletter.template, 'index.html'),
+        'mailouts/{0}/{1}'.format(newsletter.template, 'index.html'),
         context,
         context_instance=RequestContext(request)
     )

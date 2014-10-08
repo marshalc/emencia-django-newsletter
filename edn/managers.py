@@ -7,8 +7,8 @@ class ContactManager(models.Manager):
 
     def unverified_subscribers(self):
         """Return all subscribers"""
-        return self.get_query_set().filter(verified=False)
+        return self.get_queryset().filter(verified=False)
 
     def verified_subscribers(self):
         """Return only verified contacts"""
-        return self.get_query_set().filter(verified=True)
+        return self.get_queryset().filter(verified=True)

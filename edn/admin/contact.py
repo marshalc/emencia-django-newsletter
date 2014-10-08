@@ -57,7 +57,7 @@ class ContactAdmin(admin.ModelAdmin):
         """Display user subscriptions to unsubscriptions"""
         subscriptions = contact.subscriptions().count()
         unsubscriptions = contact.unsubscriptions().count()
-        return '%s / %s' % (subscriptions - unsubscriptions, subscriptions)
+        return '%s / %s' % (subscriptions, unsubscriptions)
     total_subscriptions.short_description = _('Total subscriptions')
 
     # def export_vcard(self, request, queryset, export_name=''):
@@ -135,7 +135,7 @@ class ContactAdmin(admin.ModelAdmin):
         cl = ChangeList(request, self.model, list_display, list_display_links, self.list_filter,
                         self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page,
                         self.list_editable, self.list_max_show_all, self)
-        return cl.get_query_set(request)
+        return cl.get_queryset(request)
 
     def creation_mailinglist(self, request):
         """Create a mailing list form the filtered contacts"""
