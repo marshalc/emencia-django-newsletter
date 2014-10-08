@@ -11,4 +11,4 @@ class ContactManager(models.Manager):
 
     def verified_subscribers(self):
         """Return only verified contacts"""
-        return self.subscribers().filter(verified=True)
+        return self.get_query_set().filter(verified=True)
