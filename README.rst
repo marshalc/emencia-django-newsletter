@@ -21,6 +21,7 @@ Contacts
  * Ability to have contact click a link in an automated email to validate their email address (verified contact)
  * Mark contact as a test contact for sending draft messages to (tester)
 
+
  * Dropped:
   * Set valid contact - We'll un-verify the contact if the email address becomes invalid, and set the date of
     verification request so that we can automatically (maybe?) clean these dead addresses out later
@@ -34,9 +35,11 @@ Mailing List
  * Subscribers - Contacts on this list have subscribed and still want mailings
  * Unsubscribers - Contacts on this list were subscribed, but no longer want mailings
 
+
  * Dropped
   * Visible to the public? Assuming it's all public
   * MailingListSegments - unknown purpose
+
 
 Newsletter
  * Name and HTML/Plain text content
@@ -46,6 +49,8 @@ Newsletter
  * Convert included links (in the html href) to tracked links. Optional via setting. Includes anchor tags.
  * Automatically include an unsubscribe link in each newsletter. Not optional!
  * Use a django template to format the message
+ * Internationalisation. I'll just admit this isn't something I know a lot about, nor have a use for presently.
+
 
  * Dropped
   * URL in content for inclusion
@@ -53,7 +58,7 @@ Newsletter
   * Public - assuming it's all public. If we need private (and therefore password protected) we'll add it later
   * Attachments. Add it back in later.
   * Workgroups. Not a clear purpose for use yet.
-  * Internationalisation. I'll just admit this isn't something I know a lot about, nor have a use for presently.
+
 
 Statistics
  * Want basic tracking of messages sent, and messages opened to be working.
