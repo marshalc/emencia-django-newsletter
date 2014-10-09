@@ -12,12 +12,12 @@ def get_templates():
     try:
         return (
             (i, i) for i in os.walk(
-                os.path.join(settings.TEMPLATE_DIRS[0], 'mailouts')
+                os.path.join(settings.TEMPLATE_DIRS[0], 'edn/email_templates')
             ).next()[1] if i[0] not in '.'
         )
     except (IndexError, StopIteration):
         return (
             (i, i) for i in os.walk(
-                os.path.join(get_app_template_dir('edn', 'templates'), 'mailouts')
+                os.path.join(get_app_template_dir('edn', 'templates'), 'edn/email_templates')
             ).next()[1] if i[0] not in '.'
         )

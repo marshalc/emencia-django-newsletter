@@ -65,4 +65,4 @@ def view_newsletter_historic(request, slug):
         'object_id': newsletter.pk,
         'app_label': opts.app_label
     }
-    return render_to_response('views/newsletter_historic.html', context, context_instance=RequestContext(request))
+    return render_to_response('edn/views/newsletter_historic.html', context, context_instance=RequestContext(request))

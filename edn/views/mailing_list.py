@@ -49,7 +49,7 @@ def view_mailinglist_unsubscribe(request, slug, uidb36, token):
         )
 
     return render_to_response(
-        'views/mailing_list_unsubscribe.html',
+        'edn/views/mailing_list_unsubscribe.html',
         {'email': contact.email, 'unsubscribed_count':unsubscribed, 'already_unsubscribed': already_unsubscribed},
         context_instance=RequestContext(request)
     )
@@ -73,7 +73,7 @@ def view_mailinglist_subscribe(request, form_class, mailing_list_id=None, link_i
         form = form_class()
 
     return render_to_response(
-        'views/mailing_list_subscribe.html',
+        'edn/views/mailing_list_subscribe.html',
         {'subscribed': subscribed, 'mailing_list': mailing_list, 'form': form},
         context_instance=RequestContext(request)
     )
@@ -101,7 +101,7 @@ def _view_subscriber_verification_context(request, form_class):
                 'link_id': link_id,
             })
 
-            content_html = render_to_string('views/newsletter_mail_verification.html', mail_context)
+            content_html = render_to_string('edn/views/newsletter_mail_verification.html', mail_context)
 
             content_text = html2text(content_html)
 
@@ -110,7 +110,7 @@ def _view_subscriber_verification_context(request, form_class):
             message.extra_headers = {'Reply-to': smart_str(DEFAULT_HEADER_REPLY)}
             message.to = [smart_str(context['form'].instance.email)]
             
-            message.subject = render_to_string('views/newsletter_mail_verification_subject.html', context)
+            message.subject = render_to_string('edn/views/newsletter_mail_verification_subject.html', context)
 
             message.body = smart_str(content_text)
             message.attach_alternative(smart_str(content_html), "text/html")       
@@ -133,7 +133,7 @@ def view_subscriber_verification(request, form_class):
     context = _view_subscriber_verification_context(request, form_class)
     
     return render_to_response(
-        'views/subscriber_verification.html',
+        'edn/views/subscriber_verification.html',
         context,
         context_instance=RequestContext(request)
     )
@@ -200,7 +200,7 @@ def view_uuid_verification(request, link_id, form_class=None):
     context = _view_uuid_verification_context(request, link_id, form_class)
 
     return render_to_response(
-        'views/uuid_verification.html',
+        'edn/views/uuid_verification.html',
         context,
         context_instance=RequestContext(request)
     )

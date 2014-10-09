@@ -325,16 +325,16 @@ class Newsletter(models.Model):
         context.update({'message': message_content})
 
         # link_site_exist = False
-        link_site = render_to_string('views/newsletter_link_site.html', context)
+        link_site = render_to_string('edn/views/newsletter_link_site.html', context)
         context.update({'link_site': link_site})
 
-        unsubscription = render_to_string('views/newsletter_link_unsubscribe.html', context)
+        unsubscription = render_to_string('edn/views/newsletter_link_unsubscribe.html', context)
         context.update({'unsubscription': unsubscription})
 
-        image_tracking = render_to_string('views/newsletter_image_tracking.html', context)
+        image_tracking = render_to_string('edn/views/newsletter_image_tracking.html', context)
         context.update({'image_tracking': image_tracking})
 
-        content_template = get_template('mailouts/{0}/{1}'.format(self.template, 'index.html'))
+        content_template = get_template('edn/email_templates/{0}/{1}'.format(self.template, 'index.html'))
         content = content_template.render(context)
 
         if TRACKING_LINKS:

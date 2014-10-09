@@ -65,7 +65,7 @@ def view_newsletter_statistics(request, slug):
     }
 
     return render_to_response(
-        'views/newsletter_statistics.html',
+        'edn/views/newsletter_statistics.html',
         context,
         context_instance=RequestContext(request)
     )
@@ -121,7 +121,7 @@ def view_newsletter_density(request, slug):
     )
     context = {'object': newsletter, 'top_links': get_newsletter_top_links(status)['top_links']}
 
-    return render_to_response('views/newsletter_density.html', context, context_instance=RequestContext(request))
+    return render_to_response('edn/views/newsletter_density.html', context, context_instance=RequestContext(request))
 
 
 @staff_member_required

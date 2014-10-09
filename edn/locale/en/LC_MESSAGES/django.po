@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: admin/contact.py:35 templates/views/newsletter_statistics.html:210
+#: admin/contact.py:35 templates/edn/views/newsletter_statistics.html:210
 msgid "Status"
 msgstr "Status"
 
@@ -157,11 +157,11 @@ msgstr "Email"
 msgid "Mailing lists"
 msgstr "Mailing lists"
 
-#: models.py:38 views/statistics.py:86
+#: models.py:38 edn/views/statistics.py:86
 msgid "email"
 msgstr "email"
 
-#: models.py:39 views/statistics.py:85
+#: models.py:39 edn/views/statistics.py:85
 msgid "full name"
 msgstr "full name"
 
@@ -361,86 +361,86 @@ msgstr "Export %(name)s as VCard"
 msgid "Export %(name)s as Excel"
 msgstr "Export %(name)s as Excel"
 
-#: templates/views/mailing_list_subscribe.html:4
-#: templates/views/mailing_list_subscribe.html:7
+#: templates/edn/views/mailing_list_subscribe.html:4
+#: templates/edn/views/mailing_list_subscribe.html:7
 msgid "Subscription to mailing list"
 msgstr "Subscription to mailing list"
 
-#: templates/views/mailing_list_subscribe.html:10
+#: templates/edn/views/mailing_list_subscribe.html:10
 msgid "Thanks for your subscription!"
 msgstr "Thanks for your subscription!"
 
-#: templates/views/mailing_list_subscribe.html:16
+#: templates/edn/views/mailing_list_subscribe.html:16
 msgid "Validate this form to subscribe to the mailing lists."
 msgstr "Validate this form to subscribe to the mailing lists."
 
-#: templates/views/mailing_list_subscribe.html:21
-#: templates/views/subscriber_verification.html:18
-#: templates/views/uuid_verification.html:15
+#: templates/edn/views/mailing_list_subscribe.html:21
+#: templates/edn/views/subscriber_verification.html:18
+#: templates/edn/views/uuid_verification.html:15
 msgid "Subscribe"
 msgstr "Subscribe"
 
-#: templates/views/mailing_list_unsubscribe.html:4
-#: templates/views/mailing_list_unsubscribe.html:7
+#: templates/edn/views/mailing_list_unsubscribe.html:4
+#: templates/edn/views/mailing_list_unsubscribe.html:7
 msgid "Unsubscription"
 msgstr "Unsubscription"
 
-#: templates/views/mailing_list_unsubscribe.html:10
+#: templates/edn/views/mailing_list_unsubscribe.html:10
 msgid "You are unsubscribed for all mailing lists."
 msgstr "You are unsubscribed for all mailing lists."
 
-#: templates/views/mailing_list_unsubscribe.html:12
+#: templates/edn/views/mailing_list_unsubscribe.html:12
 msgid "You are unsubscribed for this mailing list."
 msgstr "You are unsubscribed for this mailing list."
 
-#: templates/views/mailing_list_unsubscribe.html:15
+#: templates/edn/views/mailing_list_unsubscribe.html:15
 msgid "Validate this form to unsubscribe to this mailing list."
 msgstr "Validate this form to unsubscribe to this mailing list."
 
-#: templates/views/mailing_list_unsubscribe.html:19
+#: templates/edn/views/mailing_list_unsubscribe.html:19
 msgid "Unsubscribe"
 msgstr "Unsubscribe"
 
-#: templates/views/newsletter_forbidden.html:4
-#: templates/views/newsletter_forbidden.html:9
+#: templates/edn/views/newsletter_forbidden.html:4
+#: templates/edn/views/newsletter_forbidden.html:9
 msgid "You are not allowed to view this newsletter"
 msgstr "You are not allowed to view this newsletter"
 
-#: templates/views/newsletter_forbidden.html:7
+#: templates/edn/views/newsletter_forbidden.html:7
 msgid "Forbidden"
 msgstr "Forbidden"
 
-#: templates/views/newsletter_historic.html:10
-#: templates/views/newsletter_statistics.html:81
+#: templates/edn/views/newsletter_historic.html:10
+#: templates/edn/views/newsletter_statistics.html:81
 msgid "Admin."
 msgstr "Admin."
 
-#: templates/views/newsletter_historic.html:24
+#: templates/edn/views/newsletter_historic.html:24
 msgid "Date"
 msgstr "Date"
 
-#: templates/views/newsletter_historic.html:25
+#: templates/edn/views/newsletter_historic.html:25
 msgid "Contact"
 msgstr "Contact"
 
-#: templates/views/newsletter_historic.html:26
+#: templates/edn/views/newsletter_historic.html:26
 msgid "Action"
 msgstr "Action"
 
-#: templates/views/newsletter_link_site.html:7
+#: templates/edn/views/newsletter_link_site.html:7
 msgid "If you cannot see this email,"
 msgstr "If you cannot see this email,"
 
-#: templates/views/newsletter_link_site.html:8
-#: templates/views/newsletter_link_unsubscribe.html:9
+#: templates/edn/views/newsletter_link_site.html:8
+#: templates/edn/views/newsletter_link_unsubscribe.html:9
 msgid "click here"
 msgstr "click here"
 
-#: templates/views/newsletter_link_unsubscribe.html:8
+#: templates/edn/views/newsletter_link_unsubscribe.html:8
 msgid "For unsubscribing to this mailing list,"
 msgstr "For unsubscribing to this mailing list,"
 
-#: templates/views/newsletter_mail_verification.html:5
+#: templates/edn/views/newsletter_mail_verification.html:5
 msgid ""
 "Thanks for subscription, please click the following link to verify your "
 "email address."
@@ -448,157 +448,157 @@ msgstr ""
 "Thanks for subscription, please click the following link to verify your "
 "email address."
 
-#: templates/views/newsletter_mail_verification.html:6
+#: templates/edn/views/newsletter_mail_verification.html:6
 msgid "Verify link"
 msgstr "Verify link"
 
-#: templates/views/newsletter_mail_verification_subject.html:1
-#: templates/views/uuid_verification.html:4
-#: templates/views/uuid_verification.html:8
+#: templates/edn/views/newsletter_mail_verification_subject.html:1
+#: templates/edn/views/uuid_verification.html:4
+#: templates/edn/views/uuid_verification.html:8
 msgid "Subscriber verification"
 msgstr "Subscriber verification"
 
-#: templates/views/newsletter_statistics.html:99 views/statistics.py:167
+#: templates/edn/views/newsletter_statistics.html:99 edn/views/statistics.py:167
 msgid "Consultation histogram"
 msgstr "Consultation histogram"
 
-#: templates/views/newsletter_statistics.html:102
+#: templates/edn/views/newsletter_statistics.html:102
 msgid "Period"
 msgstr "Period"
 
-#: templates/views/newsletter_statistics.html:127
-#: templates/views/newsletter_statistics.html:128
+#: templates/edn/views/newsletter_statistics.html:127
+#: templates/edn/views/newsletter_statistics.html:128
 msgid "Broadcasting statistics"
 msgstr "Broadcasting statistics"
 
-#: templates/views/newsletter_statistics.html:130 views/statistics.py:157
+#: templates/edn/views/newsletter_statistics.html:130 edn/views/statistics.py:157
 msgid "Total openings"
 msgstr "Total openings"
 
-#: templates/views/newsletter_statistics.html:135
+#: templates/edn/views/newsletter_statistics.html:135
 msgid "Openings on site"
 msgstr "Openings on site"
 
-#: templates/views/newsletter_statistics.html:140
+#: templates/edn/views/newsletter_statistics.html:140
 msgid "Total openings unique"
 msgstr "Total openings unique"
 
-#: templates/views/newsletter_statistics.html:145
+#: templates/edn/views/newsletter_statistics.html:145
 msgid "Unknown delivery"
 msgstr "Unknown delivery"
 
-#: templates/views/newsletter_statistics.html:150
+#: templates/edn/views/newsletter_statistics.html:150
 msgid "Unsubscriptions"
 msgstr "Unsubscriptions"
 
-#: templates/views/newsletter_statistics.html:155
+#: templates/edn/views/newsletter_statistics.html:155
 msgid "Openings average"
 msgstr "Openings average"
 
-#: templates/views/newsletter_statistics.html:163
-#: templates/views/newsletter_statistics.html:164
+#: templates/edn/views/newsletter_statistics.html:163
+#: templates/edn/views/newsletter_statistics.html:164
 msgid "Links statistics"
 msgstr "Links statistics"
 
-#: templates/views/newsletter_statistics.html:166 views/statistics.py:162
+#: templates/edn/views/newsletter_statistics.html:166 edn/views/statistics.py:162
 msgid "Total clicked links"
 msgstr "Total clicked links"
 
-#: templates/views/newsletter_statistics.html:171
+#: templates/edn/views/newsletter_statistics.html:171
 msgid "Total clicked links unique"
 msgstr "Total clicked links unique"
 
-#: templates/views/newsletter_statistics.html:176
+#: templates/edn/views/newsletter_statistics.html:176
 msgid "Clicked links by openings"
 msgstr "Clicked links by openings"
 
-#: templates/views/newsletter_statistics.html:181
+#: templates/edn/views/newsletter_statistics.html:181
 msgid "Clicked links average"
 msgstr "Clicked links average"
 
-#: templates/views/newsletter_statistics.html:193
+#: templates/edn/views/newsletter_statistics.html:193
 msgid "Report"
 msgstr "Report"
 
-#: templates/views/newsletter_statistics.html:196
+#: templates/edn/views/newsletter_statistics.html:196
 msgid "Download CSV report"
 msgstr "Download CSV report"
 
-#: templates/views/newsletter_statistics.html:202
+#: templates/edn/views/newsletter_statistics.html:202
 msgid "Informations"
 msgstr "Informations"
 
-#: templates/views/newsletter_statistics.html:204
+#: templates/edn/views/newsletter_statistics.html:204
 msgid "Recipients"
 msgstr "Recipients"
 
-#: templates/views/newsletter_statistics.html:207
+#: templates/edn/views/newsletter_statistics.html:207
 msgid "View"
 msgstr "View"
 
-#: templates/views/newsletter_statistics.html:215
+#: templates/edn/views/newsletter_statistics.html:215
 msgid "Sending date"
 msgstr "Sending date"
 
-#: templates/views/newsletter_statistics.html:219
+#: templates/edn/views/newsletter_statistics.html:219
 msgid "Tests sent"
 msgstr "Tests sent"
 
-#: templates/views/newsletter_statistics.html:224
+#: templates/edn/views/newsletter_statistics.html:224
 msgid "Top Links"
 msgstr "Top Links"
 
-#: templates/views/newsletter_statistics.html:225
+#: templates/edn/views/newsletter_statistics.html:225
 msgid "Density map"
 msgstr "Density map"
 
-#: templates/views/newsletter_statistics.html:235
+#: templates/edn/views/newsletter_statistics.html:235
 msgid "No Top Links yet."
 msgstr "No Top Links yet."
 
-#: templates/views/subscriber_verification.html:5
-#: templates/views/subscriber_verification.html:9
+#: templates/edn/views/subscriber_verification.html:5
+#: templates/edn/views/subscriber_verification.html:9
 msgid "Subscription to the newsletter"
 msgstr "Subscription to the newsletter"
 
-#: templates/views/subscriber_verification.html:12
+#: templates/edn/views/subscriber_verification.html:12
 msgid "Thanks for your email subscription!"
 msgstr "Thanks for your email subscription!"
 
-#: templates/views/subscriber_verification.html:14
+#: templates/edn/views/subscriber_verification.html:14
 msgid "Validate this form to subscribe to the newsletter."
 msgstr "Validate this form to subscribe to the newsletter."
 
-#: templates/views/uuid_verification.html:9
+#: templates/edn/views/uuid_verification.html:9
 msgid "You have been validated. Thanks for your email subscription!"
 msgstr "You have been validated. Thanks for your email subscription!"
 
-#: templates/views/uuid_verification.html:19
+#: templates/edn/views/uuid_verification.html:19
 msgid "No verification found"
 msgstr "No verification found"
 
-#: templates/views/uuid_verification.html:20
+#: templates/edn/views/uuid_verification.html:20
 msgid "Can't find the ID to verify the email!"
 msgstr "Can't find the ID to verify the email!"
 
-#: views/statistics.py:58
+#: edn/views/statistics.py:58
 #, python-format
 msgid "Statistics of %s"
 msgstr "Statistics of %s"
 
-#: views/statistics.py:87
+#: edn/views/statistics.py:87
 msgid "openings"
 msgstr "openings"
 
-#: views/statistics.py:157
+#: edn/views/statistics.py:157
 msgid "#val# openings"
 msgstr "#val# openings"
 
-#: views/statistics.py:162
+#: edn/views/statistics.py:162
 msgid "#val# clicks"
 msgstr "#val# clicks"
 
-#: views/tracking.py:62
+#: edn/views/tracking.py:62
 #, python-format
 msgid "Historic of %s"
 msgstr "Historic of %s"
