@@ -40,13 +40,16 @@ class AllMailingListSubscriptionForm(MailingListSubscriptionForm):
     """
     Form for subscribing to all mailing lists
     """
-
-    mailing_lists = forms.ModelMultipleChoiceField(
-        queryset=MailingList.objects.all(),
-        initial=[obj.id for obj in MailingList.objects.all()],
-        label=_('Mailing lists'),
-        widget=forms.CheckboxSelectMultiple()
-    )
+    try:
+        mailing_lists = forms.ModelMultipleChoiceField(
+            queryset=MailingList.objects.all(),
+            initial=[
+                obj.id for obj in MailingList.objects.all()
+            ],
+            label=_('Mailing lists'),
+            widget=forms.CheckboxSelectMultiple()
+        )
+    except
 
     def save(self, mailing_list):
         data = self.cleaned_data

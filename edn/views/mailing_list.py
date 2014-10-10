@@ -141,7 +141,7 @@ def view_subscriber_verification(request, form_class):
 
 def _view_uuid_verification_context(request, link_id, form_class=None):
     context = {}
-    context['mailinglists'] = mailinglists = MailingList.objects.filter(public=True)
+    context['mailinglists'] = mailinglists = MailingList.objects.all()
     context['mailing_list_count'] = mailinglists.count()
     context['link_id'] = link_id
 
