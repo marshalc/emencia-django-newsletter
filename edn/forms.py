@@ -1,6 +1,7 @@
 """Forms for edn"""
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.db.utils import ProgrammingError
 
 from edn.models import Contact, MailingList, SubscriberVerification
 
@@ -49,7 +50,8 @@ class AllMailingListSubscriptionForm(MailingListSubscriptionForm):
             label=_('Mailing lists'),
             widget=forms.CheckboxSelectMultiple()
         )
-    except
+    except ProgrammingError:
+        mailing_lists = None
 
     def save(self, mailing_list):
         data = self.cleaned_data
@@ -67,14 +69,17 @@ class VerificationMailingListSubscriptionForm(forms.Form):
     """
     Form for subscribing to all mailing lists after verification
     """
-    mailing_lists = forms.ModelMultipleChoiceField(
-        queryset=MailingList.objects.all(),
-        initial=[
-            obj.id for obj in MailingList.objects.all()
-        ],
-        label=_('Mailing lists'),
-        widget=forms.CheckboxSelectMultiple(),
-    )
+    try:
+        mailing_lists = forms.ModelMultipleChoiceField(
+            queryset=MailingList.objects.all(),
+            initial=[
+                obj.id for obj in MailingList.objects.all()
+            ],
+            label=_('Mailing lists'),
+            widget=forms.CheckboxSelectMultiple(),
+        )
+    except ProgrammingError:
+        mailing_lists = None
 
     def save(self, contact_id):
         mailing_list = None
