@@ -26,4 +26,4 @@ def view_tinymce_templates(request):
             %s,
     ];
     """ % ",".join(templates)
-    return HttpResponse(page, mimetype='text/javascript; charset=utf8')
+    return HttpResponse(page, content_type='text/javascript; charset=utf8')

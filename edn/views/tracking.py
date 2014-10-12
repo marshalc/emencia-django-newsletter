@@ -25,7 +25,7 @@ def view_newsletter_tracking(request, slug, uidb36, token, format):
     newsletter = get_object_or_404(Newsletter, slug=slug)
     contact = untokenize(uidb36, token)
     ContactMailingStatus.objects.create(newsletter=newsletter, contact=contact, status=ContactMailingStatus.OPENED)
-    return HttpResponse(base64.b64decode(TRACKING_IMAGE), mimetype='image/%s' % format)
+    return HttpResponse(base64.b64decode(TRACKING_IMAGE), content_type='image/%s' % format)
 
 
 def view_newsletter_tracking_link(request, slug, uidb36, token, link_id):

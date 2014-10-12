@@ -102,7 +102,7 @@ def view_newsletter_report(request, slug):
            openings
         ] + link_cols
 
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=report-%s.csv' % newsletter.slug
 
     writer = csv.writer(response)
