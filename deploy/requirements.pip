@@ -8,7 +8,7 @@ django-tinymce >= 1.5       # For admin.newsletter.NewsletterTinyMCEForm
 django-autoslug >= 1.7.2    # For models.Newsletter
 django-uuidfield >= 0.5     # For models.SubscriberVerification
 pytz                        # For templates/admin/change_list.html
-
+django-dbbackup>=2.0.3      # For doing data backups and moving data
 
 
 # \ depends on:
